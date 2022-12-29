@@ -81,6 +81,18 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 			}
 			segment.Binlogs = append(segment.Binlogs, f)
 		}
+	} else {
+		for _, field := range segment.Binlogs {
+			for _, binlog := range field.Binlogs {
+				fmt.Println("current path", binlog.LogPath)
+				infos := strings.Split(binlog.LogPath, "/")
+				infos[0] = "in01-7db6950519a6ce4"
+				binlog.LogPath = ""
+				for _, part := range infos {
+					binlog.LogPath = path.Join(binlog.LogPath, part)
+				}
+			}
+		}
 	}
 
 	if len(segment.Deltalogs) == 0 {
