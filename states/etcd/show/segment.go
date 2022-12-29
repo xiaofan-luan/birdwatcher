@@ -83,6 +83,7 @@ func SegmentCommand(cli *clientv3.Client, basePath string) *cobra.Command {
 					common.FillFieldsIfV2(cli, basePath, info)
 					if hack {
 						p := path.Join(basePath, fmt.Sprintf("datacoord-meta/s/%d/%d/%d", info.CollectionID, info.PartitionID, info.ID))
+						info.Deltalogs[0].Binlogs = info.Deltalogs[0].Binlogs[:0]
 						printSegmentInfo(info, detail)
 						if dohack {
 							bs, err := proto.Marshal(info)
