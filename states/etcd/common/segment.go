@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -67,6 +68,15 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 				if l.LogPath == "" {
 					l.LogPath = fmt.Sprintf("files/insert_log/%d/%d/%d/%d/%d", segment.CollectionID, segment.PartitionID, segment.ID, field.FieldID, binlog.LogID)
 				}
+
+				fmt.Println("current path", l.LogPath)
+				infos := strings.Split(l.LogPath, "/")
+				infos[0] = "in01-7db6950519a6ce4"
+				l.LogPath = ""
+				for _, part := range infos {
+					l.LogPath = path.Join(l.LogPath, part)
+				}
+
 				f.Binlogs = append(f.Binlogs, l)
 			}
 			segment.Binlogs = append(segment.Binlogs, f)

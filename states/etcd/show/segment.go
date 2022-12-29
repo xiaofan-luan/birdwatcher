@@ -1,7 +1,10 @@
 package show
 
 import (
+	"context"
 	"fmt"
+	"github.com/golang/protobuf/proto"
+	"path"
 	"sort"
 	"time"
 
@@ -38,6 +41,14 @@ func SegmentCommand(cli *clientv3.Client, basePath string) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			hack, err := cmd.Flags().GetBool("hack")
+			if err != nil {
+				return err
+			}
+			dohack, err := cmd.Flags().GetBool("dohack")
+			if err != nil {
+				return err
+			}
 
 			segments, err := common.ListSegments(cli, basePath, func(info *datapb.SegmentInfo) bool {
 				return (collID == 0 || info.CollectionID == collID) &&
@@ -70,7 +81,22 @@ func SegmentCommand(cli *clientv3.Client, basePath string) *cobra.Command {
 				switch format {
 				case "table":
 					common.FillFieldsIfV2(cli, basePath, info)
-					printSegmentInfo(info, detail)
+					if hack {
+						p := path.Join(basePath, fmt.Sprintf("datacoord-meta/s/%d/%d/%d", info.CollectionID, info.PartitionID, info.ID))
+						printSegmentInfo(info, detail)
+						if dohack {
+							bs, err := proto.Marshal(info)
+							if err != nil {
+								fmt.Println("failed to marshal segment info", err.Error())
+							}
+							_, err = cli.Put(context.Background(), p, string(bs))
+							if err != nil {
+								fmt.Println("failed to put", err.Error())
+							}
+						}
+					} else {
+						printSegmentInfo(info, detail)
+					}
 				case "line":
 					fmt.Printf("SegmentID: %d State: %s, Row Count:%d\n", info.ID, info.State.String(), info.NumOfRows)
 				case "statistics":
@@ -99,6 +125,8 @@ func SegmentCommand(cli *clientv3.Client, basePath string) *cobra.Command {
 	cmd.Flags().String("format", "line", "segment display format")
 	cmd.Flags().Bool("detail", false, "flags indicating whether pring detail binlog info")
 	cmd.Flags().Int64("segment", 0, "segment id to filter with")
+	cmd.Flags().Bool("hack", false, "hack")
+	cmd.Flags().Bool("dohack", false, "dohack")
 	return cmd
 }
 
