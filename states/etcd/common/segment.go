@@ -119,7 +119,7 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 			segment.Deltalogs = append(segment.Deltalogs, f)
 		}
 	} else {
-		for _, field := range segment.Binlogs {
+		for _, field := range segment.Deltalogs {
 			for _, binlog := range field.Binlogs {
 				fmt.Println("current delta path", binlog.LogPath)
 			}
@@ -156,7 +156,7 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 			segment.Statslogs = append(segment.Statslogs, f)
 		}
 	} else {
-		for _, field := range segment.Binlogs {
+		for _, field := range segment.Statslogs {
 			for _, binlog := range field.Binlogs {
 				fmt.Println("current stat path", binlog.LogPath)
 			}
