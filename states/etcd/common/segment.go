@@ -158,7 +158,7 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 	} else {
 		for _, field := range segment.Binlogs {
 			for _, binlog := range field.Binlogs {
-				fmt.Println("current delta path", binlog.LogPath)
+				fmt.Println("current stat path", binlog.LogPath)
 			}
 		}
 	}
