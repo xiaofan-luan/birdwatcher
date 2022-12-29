@@ -156,9 +156,18 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 			segment.Statslogs = append(segment.Statslogs, f)
 		}
 	} else {
+		id := []int64{438082533260259819, 438082533260259907, 438082533260259962, 438082533260260473, 438082533260260525, 438082533260261445, 438082533260261479,
+			438082533260261660, 438082533260261771, 438082533260262101, 438082533260262165, 438082533260262481, 438082533260262711, 438082533260262749, 438082533260262795}
 		for _, field := range segment.Statslogs {
-			for _, binlog := range field.Binlogs {
-				fmt.Println("current stat path", binlog.LogPath)
+			sort.Slice(field.Binlogs, func(i, j int) bool {
+				return field.Binlogs[i].TimestampFrom < field.Binlogs[j].TimestampFrom
+			})
+			if len(id) != len(field.Binlogs) {
+				fmt.Println("size not equal, return")
+			}
+			for i, binlog := range field.Binlogs {
+				binlog.LogPath = fmt.Sprintf("in01-7db6950519a6ce4/statslog/%d/%d/%d/%d", segment.CollectionID, segment.PartitionID, segment.ID, id[i])
+				fmt.Println("file" + binlog.LogPath + "time" + string(binlog.TimestampFrom))
 			}
 		}
 	}
