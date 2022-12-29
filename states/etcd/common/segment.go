@@ -164,7 +164,7 @@ func FillFieldsIfV2(cli *clientv3.Client, basePath string, segment *datapb.Segme
 				fmt.Println("size not equal, return")
 			}
 			for i, binlog := range field.Binlogs {
-				binlog.LogPath = fmt.Sprintf("in01-7db6950519a6ce4/statslog/%d/%d/%d/%d", segment.CollectionID, segment.PartitionID, segment.ID, id[i])
+				binlog.LogPath = fmt.Sprintf("in01-7db6950519a6ce4/stats_log/%d/%d/%d/%d/%d", segment.CollectionID, segment.PartitionID, segment.ID, field.FieldID, id[i])
 				fmt.Println("file: " + binlog.LogPath + "size" + strconv.Itoa(int(binlog.LogSize)))
 			}
 		}
